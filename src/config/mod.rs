@@ -3,6 +3,8 @@ use dotenv::dotenv;
 use color_eyre::Result;
 use eyre::WrapErr;
 use serde::Deserialize;
+use tracing::{info, instrument};//macro
+use tracing_subscriber::EnvFilter;
 
 
 #[derive(Deserialize)]
@@ -29,8 +31,16 @@ pub struct Config {
 }
 
 impl Config {
+
+    #[instrument]
     pub fn from_env() -> Result<Self> {
         dotenv().ok();
+
+        tracing_subscriber::fmt()
+            .with_env_filter(EnvFilter::from_default_env())//env RUST_LOG
+            .init();
+        info!("Loading configuration..");
+
         let mut cfg = config::Config::new();
         cfg.merge(config::Environment::default())?;
 
