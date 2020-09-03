@@ -1,4 +1,6 @@
 //module config
+pub mod crypto;
+
 use dotenv::dotenv;
 use color_eyre::Result;
 use eyre::WrapErr;
@@ -6,7 +8,8 @@ use serde::Deserialize;
 use tracing::{info, instrument};//macro
 use tracing_subscriber::EnvFilter;
 use sqlx::postgres::PgPool;
-use std::time::Duration;
+use std::{sync::Arc, time::Duration};
+use crypto::CryptoService;
 
 
 #[derive(Deserialize)]
@@ -30,6 +33,7 @@ pub struct Config {
     pub database_url: String,
     pub host: String,
     pub port: i32,
+    pub secret_key: String,
 }
 
 impl Config {
@@ -59,5 +63,11 @@ impl Config {
             .build(&self.database_url)
             .await
             .context("Creating database connection pool!")//context converts Result error to eyre Report
+    }
+
+    pub fn crypto_service(&self) -> CryptoService {
+        CryptoService {
+            key: Arc::new(self.secret_key.clone()),
+        }
     }
 }

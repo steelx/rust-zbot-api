@@ -22,6 +22,7 @@ async fn main() -> Result<()> {
     
     let config = Config::from_env().expect("Failed to load env configuration");
     let db_pool = config.db_pool().await.expect("Database connection failed!");
+    let crypto_service = config.crypto_service();
 
     info!("STARTING at http://{}:{}", config.host, config.port);
 
@@ -29,6 +30,7 @@ async fn main() -> Result<()> {
         App::new()
         .wrap(Logger::default())
         .data(db_pool.clone())
+        .data(crypto_service.clone())
         .configure(app_config)
     })
     .bind(format!("{}:{}", config.host, config.port))?
