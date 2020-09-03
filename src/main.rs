@@ -1,6 +1,11 @@
 //discord bot API
+#[macro_use]
+extern crate validator_derive;
+
+
 mod config;
 mod handlers;
+mod models;
 
 //local modules
 use crate::config::Config;
