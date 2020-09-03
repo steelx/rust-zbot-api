@@ -5,6 +5,8 @@ use eyre::WrapErr;
 use serde::Deserialize;
 use tracing::{info, instrument};//macro
 use tracing_subscriber::EnvFilter;
+use sqlx::postgres::PgPool;
+use std::time::Duration;
 
 
 #[derive(Deserialize)]
@@ -47,5 +49,15 @@ impl Config {
         //WrapErr: trait can be used on Result context
         cfg.try_into()
             .context("Loading configuration from env")
+    }
+
+    pub async fn db_pool(&self) -> Result<PgPool> {
+        info!("Creating database connecting pool.");
+
+        PgPool::builder()
+            .connect_timeout(Duration::from_secs(30))
+            .build(&self.database_url)
+            .await
+            .context("Creating database connection pool!")//context converts Result error to eyre Report
     }
 }

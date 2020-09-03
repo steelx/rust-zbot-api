@@ -21,12 +21,14 @@ use actix_web::{HttpServer, App, middleware::Logger};
 async fn main() -> Result<()> {
     
     let config = Config::from_env().expect("Failed to load env configuration");
+    let db_pool = config.db_pool().await.expect("Database connection failed!");
 
     info!("STARTING at http://{}:{}", config.host, config.port);
 
     HttpServer::new(move || {
         App::new()
         .wrap(Logger::default())
+        .data(db_pool.clone())
         .configure(app_config)
     })
     .bind(format!("{}:{}", config.host, config.port))?
