@@ -23,7 +23,11 @@ pub struct UbiConfig {
     pub appid: String,// ubi-appid
     pub authorization_prefix: String,// ubi_v1 t=ACCESS_TOKEN
     pub spaces_id_pc: String,
+    pub spaces_id_xbox: String,
+    pub spaces_id_ps4: String,
     pub sandbox_pc: String,
+    pub sandbox_xbox: String,
+    pub sandbox_ps4: String,
 }
 
 #[derive(Deserialize)]
