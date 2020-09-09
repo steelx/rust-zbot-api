@@ -6,6 +6,8 @@ extern crate validator_derive;
 mod config;
 mod handlers;
 mod models;
+mod db;
+mod errors;
 
 //local modules
 use crate::config::Config;

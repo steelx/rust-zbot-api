@@ -28,7 +28,7 @@ pub struct NewUser {
     #[validate(email)]
     pub email: String,
     #[validate(length(min = 5))]
-    pub password_hash: String,
+    pub password: String,
 }
 
 #[derive(Debug, Deserialize, Validate)]
