@@ -5,7 +5,7 @@ use futures::future::{Ready, ready};
 use color_eyre::Result;
 use sqlx::{PgPool, postgres::PgQueryAs};
 use std::{sync::Arc, ops::Deref};
-use crate::{config::crypto::CryptoService, models::user::{User, NewUser}, errors::AppError};
+use crate::{config::crypto::CryptoService, models::user::{User, NewUser}, errors::AppError, models::user::UpdateProfile};
 use tracing::instrument;
 
 pub struct UserRepository {
@@ -30,6 +30,20 @@ impl UserRepository {
         .bind(new_user.username)
         .bind(new_user.email)
         .bind(password_hash)
+        .fetch_one(&*self.pool)
+        .await?;
+
+        Ok(user)
+    }
+
+    pub async fn update_profile(&self, user_id: Uuid, profile: UpdateProfile) -> Result<User> {
+        let user = sqlx::query_as::<_, User>(
+            "update users set full_name = $2, bio = $3, image = $4 where id = $1 returning *",
+        )
+        .bind(user_id)
+        .bind(profile.full_name)
+        .bind(profile.bio)
+        .bind(profile.image)
         .fetch_one(&*self.pool)
         .await?;
 

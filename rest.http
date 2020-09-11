@@ -1,7 +1,8 @@
 ###
 GET http://127.0.0.1:8080/
 
-###
+
+### CREATE USER
 POST http://127.0.0.1:8080/signup HTTP/1.1
 content-type: application/json
 
@@ -11,8 +12,24 @@ content-type: application/json
     "password": "123456"
 }
 
+### GET PROFILE
+GET http://127.0.0.1:8080/me
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZS0yZmU2LTRkYjktYWU1Yi1iZmNmMDE2ZGQ2NTgiLCJleHAiOjE1OTk5MjM5NDN9.O2aWi4QDS7Ac__UGDACQA0sttosAJIGPkUIeUb2MwB4
 
-###
+
+### UPDATE PROFILE
+POST http://127.0.0.1:8080/me
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZS0yZmU2LTRkYjktYWU1Yi1iZmNmMDE2ZGQ2NTgiLCJleHAiOjE1OTk5MjM5NDN9.O2aWi4QDS7Ac__UGDACQA0sttosAJIGPkUIeUb2MwB4
+
+{
+    "full_name": "Ajinkya X",
+    "bio": "love to code in Rust programming language!!!",
+    "image": "https://i.imgur.com/8X0r6Uz.png"
+}
+
+### LOGIN
 POST http://127.0.0.1:8080/auth HTTP/1.1
 content-type: application/json
 Authorization: Basic ajinkya_test:123456

@@ -6,7 +6,7 @@ use crate::{
     config::crypto::CryptoService,
     db::user::UserRepository,
     errors::AppError,
-    models::user::{NewUser, User},
+    models::user::{NewUser, User, UpdateProfile},
 };
 
 use actix_web::{
@@ -73,6 +73,7 @@ pub async fn create_user(user: Json<NewUser>, repository: UserRepository, crypto
     }
 }
 
+#[instrument[skip(repository)]]
 pub async fn me(user: AuthenticatedUser, repository: UserRepository) -> AppResponse {
     let user = repository
         .find_by_id(user.0)
@@ -80,4 +81,39 @@ pub async fn me(user: AuthenticatedUser, repository: UserRepository) -> AppRespo
         .ok_or(AppError::INTERNAL_ERROR)?;
     
     Ok(HttpResponse::Ok().json(user))
+}
+
+pub async fn update_profile(
+    user: AuthenticatedUser, repository: UserRepository, profile: Json<UpdateProfile>) -> AppResponse {
+    
+    //valid update_profile has all required fields
+    match profile.validate() {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            let error_map = e.field_errors();
+
+            let message = if error_map.contains_key("image") {
+                format!(
+                    "Invalid image. \"{}\" is not a valid url.",
+                    profile.image.as_deref().unwrap()
+                )
+            } else {
+                "Invalid input.".to_string()
+            };
+
+            Err(AppError::INVALID_INPUT.message(message))
+        }
+    }?;
+
+    
+    // find user from Auth token
+    let user = repository
+        .find_by_id(user.0)
+        .await?
+        .ok_or(AppError::INTERNAL_ERROR)?;
+    
+    //update to DB
+    let updated_user = repository.update_profile(user.id, profile.0).await?;
+
+    Ok(HttpResponse::Ok().json(updated_user))
 }

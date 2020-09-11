@@ -55,6 +55,7 @@ impl FromRequest for AuthenticatedUser {
     }
 }
 
+/// auth create a new user credentials
 #[instrument(skip(basic, repository, hashing))]
 pub async fn auth(
     basic: BasicAuth,
