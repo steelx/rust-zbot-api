@@ -10,3 +10,9 @@ content-type: application/json
     "email": "ajinkya@gmail.com",
     "password": "123456"
 }
+
+
+###
+POST http://127.0.0.1:8080/auth HTTP/1.1
+content-type: application/json
+Authorization: Basic ajinkya_test:123456

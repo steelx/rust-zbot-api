@@ -73,11 +73,26 @@ dependencies = [
  "pin-project",
  "rand 0.7.3",
  "regex",
+ "ring",
  "serde 1.0.115",
  "serde_json",
  "serde_urlencoded",
  "sha1",
  "slab",
+ "time",
+]
+
+[[package]]
+name = "actix-identity"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2a379b0639c293292d71defb8cc1f94c87b7705c904adf044338ad392df77c7a"
+dependencies = [
+ "actix-service",
+ "actix-web",
+ "futures 0.3.5",
+ "serde 1.0.115",
+ "serde_json",
  "time",
 ]
 
@@ -257,6 +272,19 @@ dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
  "syn",
+]
+
+[[package]]
+name = "actix-web-httpauth"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ea25b3a3e113d04ae74bfbc3ba617f6254437dbd03576d9b479e8e8df894285"
+dependencies = [
+ "actix-service",
+ "actix-web",
+ "base64 0.12.3",
+ "bytes",
+ "futures-util",
 ]
 
 [[package]]
@@ -784,8 +812,10 @@ dependencies = [
 name = "discord-zbot-api"
 version = "0.1.0"
 dependencies = [
+ "actix-identity",
  "actix-rt",
  "actix-web",
+ "actix-web-httpauth",
  "argonautica",
  "chrono",
  "color-eyre",

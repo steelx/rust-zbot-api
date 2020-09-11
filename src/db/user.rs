@@ -1,4 +1,5 @@
 // db user
+use uuid::Uuid;
 use actix_web::{web::Data, FromRequest};
 use futures::future::{Ready, ready};
 use color_eyre::Result;
@@ -33,6 +34,26 @@ impl UserRepository {
         .await?;
 
         Ok(user)
+    }
+
+    #[instrument(skip(self))]
+    pub async fn find_by_username(&self, username: &str) -> Result<Option<User>> {
+        let maybe_user = sqlx::query_as::<_, User>("select * from users where username = $1")
+            .bind(username)
+            .fetch_optional(&*self.pool)
+            .await?;
+
+        Ok(maybe_user)
+    }
+    
+    #[instrument(skip(self))]
+    pub async fn find_by_id(&self, id: Uuid) -> Result<Option<User>> {
+        let maybe_user = sqlx::query_as::<_, User>("select * from users where id = $1")
+            .bind(id)
+            .fetch_optional(&*self.pool)
+            .await?;
+
+        Ok(maybe_user)
     }
 }
 

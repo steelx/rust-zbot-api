@@ -1,6 +1,6 @@
 //handlers user
 
-use super::AppResponse;
+use super::{AppResponse, auth::AuthenticatedUser};
 use crate::{
     db, 
     config::crypto::CryptoService,
@@ -71,4 +71,13 @@ pub async fn create_user(user: Json<NewUser>, repository: UserRepository, crypto
             Err(error)
         }
     }
+}
+
+pub async fn me(user: AuthenticatedUser, repository: UserRepository) -> AppResponse {
+    let user = repository
+        .find_by_id(user.0)
+        .await?
+        .ok_or(AppError::INTERNAL_ERROR)?;
+    
+    Ok(HttpResponse::Ok().json(user))
 }
