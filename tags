@@ -1,0 +1,9 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+main	target/debug/build/argonautica-59c13401f32600c0/out/flag_check.c	/^int main(void) { return 0; }/;"	f
+main	target/debug/build/argonautica-84ccfeabf7c53353/out/flag_check.c	/^int main(void) { return 0; }/;"	f
+main	target/rls/debug/build/argonautica-84ccfeabf7c53353/out/flag_check.c	/^int main(void) { return 0; }/;"	f

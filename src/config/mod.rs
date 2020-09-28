@@ -1,16 +1,15 @@
 //module config
 pub mod crypto;
 
-use dotenv::dotenv;
 use color_eyre::Result;
+use crypto::CryptoService;
+use dotenv::dotenv;
 use eyre::WrapErr;
 use serde::Deserialize;
-use tracing::{info, instrument};//macro
-use tracing_subscriber::EnvFilter;
 use sqlx::postgres::PgPool;
 use std::{sync::Arc, time::Duration};
-use crypto::CryptoService;
-
+use tracing::{info, instrument}; //macro
+use tracing_subscriber::EnvFilter;
 
 #[derive(Deserialize)]
 pub struct AuthConfig {
@@ -20,8 +19,8 @@ pub struct AuthConfig {
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct UbiConfig {
-    pub appid: String,// ubi-appid
-    pub authorization_prefix: String,// ubi_v1 t=ACCESS_TOKEN
+    pub appid: String,                // ubi-appid
+    pub authorization_prefix: String, // ubi_v1 t=ACCESS_TOKEN
     pub spaces_id_pc: String,
     pub spaces_id_xbox: String,
     pub spaces_id_ps4: String,
@@ -42,13 +41,12 @@ pub struct Config {
 }
 
 impl Config {
-
     #[instrument]
     pub fn from_env() -> Result<Self> {
         dotenv().ok();
 
         tracing_subscriber::fmt()
-            .with_env_filter(EnvFilter::from_default_env())//env RUST_LOG
+            .with_env_filter(EnvFilter::from_default_env()) //env RUST_LOG
             .init();
         info!("Loading configuration..");
 
@@ -56,8 +54,7 @@ impl Config {
         cfg.merge(config::Environment::default())?;
 
         //WrapErr: trait can be used on Result context
-        cfg.try_into()
-            .context("Loading configuration from env")
+        cfg.try_into().context("Loading configuration from env")
     }
 
     pub async fn db_pool(&self) -> Result<PgPool> {
@@ -67,7 +64,7 @@ impl Config {
             .connect_timeout(Duration::from_secs(30))
             .build(&self.database_url)
             .await
-            .context("Creating database connection pool!")//context converts Result error to eyre Report
+            .context("Creating database connection pool!") //context converts Result error to eyre Report
     }
 
     pub fn crypto_service(&self) -> CryptoService {

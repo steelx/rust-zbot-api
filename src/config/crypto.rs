@@ -35,14 +35,13 @@ pub struct CryptoService {
 }
 
 impl CryptoService {
-
     #[instrument(skip(self, password))]
     pub async fn hash_password(&self, password: String) -> Result<String> {
         Hasher::default()
             .with_secret_key(&*self.key)
             .with_password(password)
             .hash_non_blocking()
-            .compat()//Future01CompatExt converts to current version of Future
+            .compat() //Future01CompatExt converts to current version of Future
             .await
             .map_err(|err| eyre!("Hashing error: {:?}", err))
     }
@@ -88,4 +87,3 @@ impl CryptoService {
         .map_err(|err| eyre!("Verifying jwt token: {}", err))
     }
 }
-

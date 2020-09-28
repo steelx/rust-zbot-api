@@ -63,12 +63,10 @@ pub async fn auth(
     hashing: Data<CryptoService>,
 ) -> AppResponse {
     let username = basic.user_id();
-    let password = basic
-        .password()
-        .ok_or_else(|| {
-            debug!("Invalid request. Missing Basic Auth.");
-            AppError::INVALID_CREDENTIALS
-        })?;
+    let password = basic.password().ok_or_else(|| {
+        debug!("Invalid request. Missing Basic Auth.");
+        AppError::INVALID_CREDENTIALS
+    })?;
 
     let user = repository
         .find_by_username(username)

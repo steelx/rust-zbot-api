@@ -1,31 +1,32 @@
 // db user
-use uuid::Uuid;
+use crate::{
+    config::crypto::CryptoService,
+    errors::AppError,
+    models::user::UpdateProfile,
+    models::user::{NewUser, User},
+};
 use actix_web::{web::Data, FromRequest};
-use futures::future::{Ready, ready};
 use color_eyre::Result;
-use sqlx::{PgPool, postgres::PgQueryAs};
-use std::{sync::Arc, ops::Deref};
-use crate::{config::crypto::CryptoService, models::user::{User, NewUser}, errors::AppError, models::user::UpdateProfile};
+use futures::future::{ready, Ready};
+use sqlx::{postgres::PgQueryAs, PgPool};
+use std::{ops::Deref, sync::Arc};
 use tracing::instrument;
+use uuid::Uuid;
 
 pub struct UserRepository {
     pool: Arc<PgPool>,
 }
 
 impl UserRepository {
-    
     pub fn new(pool: Arc<PgPool>) -> Self {
-        UserRepository {
-            pool,
-        }
+        UserRepository { pool }
     }
 
     pub async fn create(&self, new_user: NewUser, crypto_service: &CryptoService) -> Result<User> {
         let password_hash = crypto_service.hash_password(new_user.password).await?;
-        
         //insert into DB uses trait PgQueryAs
         let user = sqlx::query_as::<_, User>(
-            "insert into users (username, email, password_hash) values ($1, $2, $3) returning *"
+            "insert into users (username, email, password_hash) values ($1, $2, $3) returning *",
         )
         .bind(new_user.username)
         .bind(new_user.email)
@@ -59,7 +60,7 @@ impl UserRepository {
 
         Ok(maybe_user)
     }
-    
+
     #[instrument(skip(self))]
     pub async fn find_by_id(&self, id: Uuid) -> Result<Option<User>> {
         let maybe_user = sqlx::query_as::<_, User>("select * from users where id = $1")

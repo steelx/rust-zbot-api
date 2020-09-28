@@ -30,3 +30,4 @@ validator_derive = "0.10"
 jsonwebtoken = "7.1"
 argonautica = { version = "0.2", features = ["simd"] } #password hash algorithem
 futures = { version = "0.3", features = ["compat"]}
+reqwest = {version = "0.10", features = ["json"] }

@@ -15,7 +15,7 @@ content-type: application/json
 ### GET PROFILE
 GET http://127.0.0.1:8080/me
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZS0yZmU2LTRkYjktYWU1Yi1iZmNmMDE2ZGQ2NTgiLCJleHAiOjE1OTk5MjM5NDN9.O2aWi4QDS7Ac__UGDACQA0sttosAJIGPkUIeUb2MwB4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZS0yZmU2LTRkYjktYWU1Yi1iZmNmMDE2ZGQ2NTgiLCJleHAiOjE2MDAwMTQ5MDh9.TrN7E15LQRqret-mGVl8pvda4tSWMufvN-EPTnBchRk
 
 
 ### UPDATE PROFILE

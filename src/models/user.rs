@@ -1,6 +1,6 @@
-use uuid::Uuid;
 use chrono::NaiveDateTime;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 use validator::Validate;
 
 //retrive from DB
@@ -18,7 +18,6 @@ pub struct User {
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
-
 
 //add it to DB
 #[derive(Debug, Deserialize, Validate)]
