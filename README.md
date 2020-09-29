@@ -7,10 +7,14 @@
 sudo apt install clang llvm-dev libclang-dev
 ```
 
-
+### Run posgress DB
 ```
 docker-compose up -d
+```
 
+### Port already in use error FIX & try again
+```
+sudo service postgresql stop
 ```
 
 

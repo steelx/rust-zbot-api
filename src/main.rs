@@ -36,10 +36,16 @@ async fn main() -> Result<()> {
         req_client,
         config.ubi,
     );
+
+
     ubi_api
         .login(ubi_user_db)
         .await
         .expect("UBI authentication failed!");
+
+    // TODO: (next time)
+    // now that we are logged int, ubi_users table in DB has our ubi user token
+    // use that, dont login again
 
     HttpServer::new(move || {
         App::new()

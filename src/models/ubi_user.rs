@@ -4,7 +4,7 @@ use uuid::Uuid;
 use validator::Validate;
 
 //retrive from DB
-#[derive(Debug, Serialize, sqlx::FromRow)]
+#[derive(Debug, Clone, Serialize, sqlx::FromRow)]
 pub struct UbiUser {
     pub id: Uuid,
     pub email: String,

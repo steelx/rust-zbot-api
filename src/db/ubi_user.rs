@@ -36,7 +36,7 @@ impl UbiUserRepository {
 
     pub async fn update_ubi_user(&self, user_id: Uuid, profile: UpdateUbiUser) -> Result<UbiUser> {
         let user = sqlx::query_as::<_, UbiUser>(
-            "update users set token = $2, expiration = $3 where id = $1 returning *",
+            "update ubi_users set token = $2, expiration = $3 where id = $1 returning *",
         )
         .bind(user_id)
         .bind(profile.token)
@@ -49,7 +49,7 @@ impl UbiUserRepository {
 
     #[instrument(skip(self))]
     pub async fn find_by_email(&self, email: &str) -> Result<Option<UbiUser>> {
-        let maybe_user = sqlx::query_as::<_, UbiUser>("select * from users where email = $1")
+        let maybe_user = sqlx::query_as::<_, UbiUser>("select * from ubi_users where email = $1")
             .bind(email)
             .fetch_optional(&*self.pool)
             .await?;
@@ -59,7 +59,16 @@ impl UbiUserRepository {
 
     #[instrument(skip(self))]
     pub async fn find_by_id(&self, id: Uuid) -> Result<Option<UbiUser>> {
-        let maybe_user = sqlx::query_as::<_, UbiUser>("select * from users where id = $1")
+        let maybe_user = sqlx::query_as::<_, UbiUser>("select * from ubi_users where id = $1")
+            .bind(id)
+            .fetch_optional(&*self.pool)
+            .await?;
+
+        Ok(maybe_user)
+    }
+
+    pub async fn delete_by_id(&self, id: Uuid) -> Result<Option<UbiUser>> {
+        let maybe_user = sqlx::query_as::<_, UbiUser>("delete from ubi_users where id = $1")
             .bind(id)
             .fetch_optional(&*self.pool)
             .await?;
