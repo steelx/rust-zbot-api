@@ -1,6 +1,7 @@
 // mod handlers
 mod auth;
 mod user;
+mod r6stats;
 
 use actix_web::{web, web::ServiceConfig, HttpResponse};
 
@@ -20,11 +21,15 @@ pub fn app_config(config: &mut ServiceConfig) {
 
     let signup = web::resource("/signup").route(web::post().to(create_user));
 
+    //ubi
+    let ubi_stats = web::resource("/ubi/stats").route(web::get().to(r6stats::stats));
+
     config
         .service(ping_resource)
         .service(signup)
         .service(auth)
-        .service(me);
+        .service(me)
+        .service(ubi_stats);
 }
 
 pub async fn ping() -> HttpResponse {

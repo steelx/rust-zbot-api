@@ -1,4 +1,4 @@
-use crate::{config::UbiConfig, errors::AppError, handlers::AppResponse};
+use crate::{config::UbiConfig, errors::AppError, handlers::AppResponse, handlers::AppResult};
 use crate::models::ubi_user::{NewUbiUser, UbiUser, UpdateUbiUser};
 use crate::UbiUserRepository;
 use crate::db;
@@ -11,7 +11,7 @@ use sqlx::{error::DatabaseError, postgres::PgError};
 use tracing::{debug, info};
 use reqwest::header::{
     HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION, CONNECTION, CONTENT_LENGTH, CONTENT_TYPE,
-    USER_AGENT, REFERER, ORIGIN
+    USER_AGENT, REFERER,
 };
 //use tracing::{debug, instrument};
 
@@ -102,29 +102,6 @@ impl UbiApi {
         self.expiration = expiration;
     }
 
-    pub async fn check_return_login(&mut self, repository: UbiUserRepository) -> AppResponse {
-        let user_result = repository
-            .find_by_email(self.email.as_str())
-            .await?
-            .ok_or_else(|| {
-                debug!("User doesn't exist.");
-                AppError::INVALID_CREDENTIALS
-            });
-
-        match user_result {
-            Ok(user) => {
-                info!("Found existing UBI login");
-                self.update_login(user.clone(), repository).await?;
-
-                return Ok(HttpResponse::Ok().json(user));
-            },
-            Err(e) => {
-                debug!("Error ticket expired, please login fresh. {:?}", e);
-                Err(AppError::INTERNAL_ERROR.default())
-            },
-        }
-    }
-
     pub async fn login(&mut self, repository: UbiUserRepository) -> AppResponse {
 
         let user_result = repository
@@ -188,8 +165,6 @@ impl UbiApi {
             debug!("Error reading UBI session response. {:?}", op);
             AppError::INTERNAL_ERROR.default()
         })?;
-
-        //println!("{:#?}", body.clone());
 
         self.prefix_authorization(body.ticket, body.expiration);
 
@@ -324,26 +299,28 @@ impl UbiApi {
         }
     }
 
-    pub async fn find_profile(
-        &mut self,
-        username: String,
-        platform_type: String,
-    ) -> Result<Profile, Box<dyn std::error::Error>> {
+    pub async fn find_profile(&self, username: String, platform_type: String) -> AppResult<Profile> {
         // let url = reqwest::Url::parse_with_params("https://public-ubiservices.ubi.com/v2/profiles",
         //     &[("platformType", platform_type), ("nameOnPlatform", username)])?;
         println!("platform_type: {}", platform_type);
 
         let url_str = format!("https://public-ubiservices.ubi.com/v1/profiles/me/club/aggregation/website/otherProfile/{}", username);
-        let url = reqwest::Url::parse(&url_str)?;
+        let url = reqwest::Url::parse(&url_str).map_err(|op| {
+            debug!("Error parsing URL {:?}", op);
+            AppError::INTERNAL_ERROR.default()
+        })?;
 
         let response = self
             .client
             .get(url)
             .headers(self.construct_headers(false))
             .send()
-            .await?;
-        //
-        println!("findProfile: {}", response.status());
+            .await
+            .map_err(|op| {
+                debug!("Error ubi_api could not find username. {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            })?;
+
         if response.status() == 404 {
             return Ok(Profile {
                 profile_id: String::from(""),
@@ -353,7 +330,11 @@ impl UbiApi {
             });
         }
 
-        let body = response.json::<Profile>().await?;
+        let body = response.json::<Profile>().await.map_err(|op| {
+            debug!("Error parsing URL {:?}", op);
+            AppError::INTERNAL_ERROR.default()
+        })?;
+
         Ok(body)
     }
 

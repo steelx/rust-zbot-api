@@ -15,7 +15,7 @@ content-type: application/json
 ### GET PROFILE
 GET http://127.0.0.1:8080/me
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZS0yZmU2LTRkYjktYWU1Yi1iZmNmMDE2ZGQ2NTgiLCJleHAiOjE2MDAwMTQ5MDh9.TrN7E15LQRqret-mGVl8pvda4tSWMufvN-EPTnBchRk
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZS0yZmU2LTRkYjktYWU1Yi1iZmNmMDE2ZGQ2NTgiLCJleHAiOjE2MDE1MzE1NDl9.xoft1tIUB6DLaWtqsQcDwPT-yBUGzrE25NkVL-RUaTI
 
 
 ### UPDATE PROFILE
@@ -33,3 +33,8 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZ
 POST http://127.0.0.1:8080/auth HTTP/1.1
 content-type: application/json
 Authorization: Basic ajinkya_test:123456
+
+
+### GET STATS
+GET http://127.0.0.1:8080/ubi/stats?name_on_platform=og_steel&platform_type=uplay
+Content-Type: application/json
