@@ -331,28 +331,38 @@ impl UbiApi {
         }
 
         let body = response.json::<Profile>().await.map_err(|op| {
-            debug!("Error parsing URL {:?}", op);
+            debug!("Error parsing Profile {:?}", op);
             AppError::INTERNAL_ERROR.default()
         })?;
 
         Ok(body)
     }
 
-    pub async fn find_rank_stats(
-        &self,
-        profile_id: String,
-    ) -> Result<PlayerStats, Box<dyn std::error::Error>> {
+    pub async fn find_rank_stats(&self, profile_id: String) -> AppResult<PlayerStats> {
         let url = reqwest::Url::parse_with_params("https://public-ubiservices.ubi.com/v1/spaces/5172a557-50b5-4665-b7db-e3f2e8c5041d/sandboxes/OSBOR_PC_LNCH_A/r6karma/players", 
-            &[("board_id", "pvp_ranked"), ("profile_ids", &profile_id), ("region_id", "apac"), ("season_id", "-1")])?;
+            &[("board_id", "pvp_ranked"), ("profile_ids", &profile_id), ("region_id", "apac"), ("season_id", "-1")])
+            .map_err(|op| {
+                debug!("Error parsing URL {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            })?;
 
         let response = self
             .client
             .get(url)
             .headers(self.construct_headers(false))
             .send()
-            .await?;
+            .await
+            .map_err(|op| {
+                debug!("Error ubi_api could not find stats. {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            })?;
 
-        let body = response.json::<RankStats>().await?;
+        let body = response.json::<RankStats>().await
+            .map_err(|op| {
+                debug!("Error parsing RankStats {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            })?;
+        
         let stats = body.players.get(&profile_id).expect("Profile id not found");
         Ok(stats.to_owned())
     }

@@ -25,7 +25,8 @@ pub async fn stats(Query(req): Query<StatsQuery>, ubi_api: Data<ubi::ubi_api::Ub
         return Err(AppError::NOT_FOUND.message(format!("User {:?} not found on platform {:?}", req.name_on_platform, req.platform_type)));
     }
     
+    let player_stats = ubi_api.find_rank_stats(ubi_profile.profile_id).await?;
     
-    Ok(HttpResponse::Ok().json(ubi_profile))
+    Ok(HttpResponse::Ok().json(player_stats))
 }
 
