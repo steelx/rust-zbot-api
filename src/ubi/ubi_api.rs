@@ -6,7 +6,6 @@ use actix_web::HttpResponse;
 use serde::{Deserialize, Serialize};
 //use serde_json::{json};
 use std::collections::HashMap;
-use color_eyre::Result;
 use sqlx::{error::DatabaseError, postgres::PgError};
 use tracing::{debug, info};
 use reqwest::header::{

@@ -3,10 +3,9 @@ use crate::ubi;
 use crate::errors::AppError;
 
 use super::{AppResponse};
-use serde::{Deserialize, Serialize};
-use tracing::{debug, info};
+use serde::{Deserialize};
 use actix_web::{
-    web::{Data, Json, Query},
+    web::{Data, Query},
     HttpResponse,
 };
 
