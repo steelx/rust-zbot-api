@@ -4,7 +4,6 @@ use crate::UbiUserRepository;
 use crate::db;
 use actix_web::HttpResponse;
 use serde::{Deserialize, Serialize};
-//use serde_json::{json};
 use std::collections::HashMap;
 use sqlx::{error::DatabaseError, postgres::PgError};
 use tracing::{debug, info};
@@ -29,9 +28,16 @@ pub struct Session {
 #[serde(rename_all = "camelCase")]
 pub struct Profile {
     pub profile_id: String,
-    pub is_friend: bool,
-    pub avatar: String,
-    pub member_since: String, //"2017-09-17T03:01:35.86Z"
+    pub user_id: String,
+    pub platform_type: String,
+    pub id_on_platform: String,
+    pub name_on_platform: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Profiles {
+    pub profiles: Vec<Profile>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -298,16 +304,19 @@ impl UbiApi {
         }
     }
 
-    pub async fn find_profile(&self, username: String, platform_type: String) -> AppResult<Profile> {
-        // let url = reqwest::Url::parse_with_params("https://public-ubiservices.ubi.com/v2/profiles",
-        //     &[("platformType", platform_type), ("nameOnPlatform", username)])?;
-        println!("platform_type: {}", platform_type);
+    pub async fn find_profile(&self, username: String, platform_type: String) -> AppResult<Profiles> {
+        let url = reqwest::Url::parse_with_params("https://public-ubiservices.ubi.com/v2/profiles",
+            &[("platformType", platform_type), ("nameOnPlatform", username)])
+            .map_err(|op| {
+                debug!("Error parsing URL {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            })?;
 
-        let url_str = format!("https://public-ubiservices.ubi.com/v1/profiles/me/club/aggregation/website/otherProfile/{}", username);
-        let url = reqwest::Url::parse(&url_str).map_err(|op| {
-            debug!("Error parsing URL {:?}", op);
-            AppError::INTERNAL_ERROR.default()
-        })?;
+        // let url_str = format!("https://public-ubiservices.ubi.com/v2/profiles?nameOnPlatform={}&platformType={}", username, platform_type);
+        // let url = reqwest::Url::parse(&url_str).map_err(|op| {
+        //     debug!("Error parsing URL {:?}", op);
+        //     AppError::INTERNAL_ERROR.default()
+        // })?;
 
         let response = self
             .client
@@ -321,25 +330,24 @@ impl UbiApi {
             })?;
 
         if response.status() == 404 {
-            return Ok(Profile {
-                profile_id: String::from(""),
-                is_friend: false,
-                avatar: String::from(""),
-                member_since: String::from(""),
-            });
+            debug!("Error profile not found");
+            return Err(AppError::NOT_FOUND.default());
         }
 
-        let body = response.json::<Profile>().await.map_err(|op| {
-            debug!("Error parsing Profile {:?}", op);
-            AppError::INTERNAL_ERROR.default()
-        })?;
+        // println!("BODY: {:#?}", response.text().await);
 
-        Ok(body)
+        let profiles = response.json::<Profiles>().await
+            .map_err(|op| {
+                debug!("Error parsing Profiles {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            })?;
+
+        Ok(profiles)
     }
 
-    pub async fn find_rank_stats(&self, profile_id: String) -> AppResult<PlayerStats> {
+    pub async fn find_rank_stats(&self, profile_id: String, region_id: String) -> AppResult<PlayerStats> {
         let url = reqwest::Url::parse_with_params("https://public-ubiservices.ubi.com/v1/spaces/5172a557-50b5-4665-b7db-e3f2e8c5041d/sandboxes/OSBOR_PC_LNCH_A/r6karma/players", 
-            &[("board_id", "pvp_ranked"), ("profile_ids", &profile_id), ("region_id", "apac"), ("season_id", "-1")])
+            &[("board_id", "pvp_ranked"), ("profile_ids", &profile_id), ("region_id", &region_id), ("season_id", "-1")])
             .map_err(|op| {
                 debug!("Error parsing URL {:?}", op);
                 AppError::INTERNAL_ERROR.default()

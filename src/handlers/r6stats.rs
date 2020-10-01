@@ -11,21 +11,32 @@ use actix_web::{
 
 
 #[derive(Deserialize)]
-pub struct StatsQuery {
+pub struct FindProfile {
     name_on_platform: String,
     platform_type: String,//uplay | psn | xbl
 }
 
-pub async fn stats(Query(req): Query<StatsQuery>, ubi_api: Data<ubi::ubi_api::UbiApi>) -> AppResponse {
+#[derive(Deserialize)]
+pub struct FindStats {
+    profile_id: String,
+    region_id: String,//"apac" | emea
+}
 
-    let ubi_profile = ubi_api.find_profile(req.name_on_platform.clone(), req.platform_type.clone()).await?;
+pub async fn find_stats(Query(req): Query<FindStats>, ubi_api: Data<ubi::ubi_api::UbiApi>) -> AppResponse {
     
-    if ubi_profile.profile_id == "" {
-        return Err(AppError::NOT_FOUND.message(format!("User {:?} not found on platform {:?}", req.name_on_platform, req.platform_type)));
-    }
-    
-    let player_stats = ubi_api.find_rank_stats(ubi_profile.profile_id).await?;
+    let player_stats = ubi_api.find_rank_stats(req.profile_id, req.region_id).await?;
     
     Ok(HttpResponse::Ok().json(player_stats))
+}
+
+pub async fn find_profile(Query(req): Query<FindProfile>, ubi_api: Data<ubi::ubi_api::UbiApi>) -> AppResponse {
+
+    let profiles = ubi_api.find_profile(req.name_on_platform.clone(), req.platform_type.clone()).await?;
+    
+    if profiles.profiles.len() == 0 {
+        return Err(AppError::NOT_FOUND.message(format!("Profile {:?} not found on platform {:?}", req.name_on_platform, req.platform_type)));
+    }
+    
+    Ok(HttpResponse::Ok().json(profiles))
 }
 

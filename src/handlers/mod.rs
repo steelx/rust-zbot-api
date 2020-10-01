@@ -22,14 +22,16 @@ pub fn app_config(config: &mut ServiceConfig) {
     let signup = web::resource("/signup").route(web::post().to(create_user));
 
     //ubi
-    let ubi_stats = web::resource("/ubi/stats").route(web::get().to(r6stats::stats));
+    let find_profile = web::resource("/ubi/find_profile").route(web::get().to(r6stats::find_profile));
+    let find_stats = web::resource("/ubi/find_stats").route(web::get().to(r6stats::find_stats));
 
     config
         .service(ping_resource)
         .service(signup)
         .service(auth)
         .service(me)
-        .service(ubi_stats);
+        .service(find_stats)
+        .service(find_profile);
 }
 
 pub async fn ping() -> HttpResponse {
