@@ -345,13 +345,25 @@ impl UbiApi {
         Ok(profiles)
     }
 
-    pub async fn find_rank_stats(&self, profile_id: String, region_id: String) -> AppResult<PlayerStats> {
-        let url = reqwest::Url::parse_with_params("https://public-ubiservices.ubi.com/v1/spaces/5172a557-50b5-4665-b7db-e3f2e8c5041d/sandboxes/OSBOR_PC_LNCH_A/r6karma/players", 
+    pub async fn find_rank_stats(&self, profile_id: String, region_id: String, platform_type: &str) -> AppResult<PlayerStats> {
+        let base_url = match platform_type {
+			"xbl" =>
+			"https://public-ubiservices.ubi.com/v1/spaces/98a601e5-ca91-4440-b1c5-753f601a2c90/sandboxes/OSBOR_XBOXONE_LNCH_A/r6karma/players",
+			"psn" =>
+            "https://public-ubiservices.ubi.com/v1/spaces/05bfb3f7-6c21-4c42-be1f-97a33fb5cf66/sandboxes/OSBOR_PS4_LNCH_A/r6karma/players",
+            _ =>
+			"https://public-ubiservices.ubi.com/v1/spaces/5172a557-50b5-4665-b7db-e3f2e8c5041d/sandboxes/OSBOR_PC_LNCH_A/r6karma/players",
+        };
+
+
+        let url = reqwest::Url::parse_with_params(
+            base_url,
             &[("board_id", "pvp_ranked"), ("profile_ids", &profile_id), ("region_id", &region_id), ("season_id", "-1")])
             .map_err(|op| {
                 debug!("Error parsing URL {:?}", op);
                 AppError::INTERNAL_ERROR.default()
-            })?;
+            }
+        )?;
 
         let response = self
             .client

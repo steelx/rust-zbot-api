@@ -19,12 +19,13 @@ pub struct FindProfile {
 #[derive(Deserialize)]
 pub struct FindStats {
     profile_id: String,
-    region_id: String,//"apac" | emea
+    region_id: String,//"apac" | emea'
+    platform_type: String,//uplay | psn | xbl
 }
 
 pub async fn find_stats(Query(req): Query<FindStats>, ubi_api: Data<ubi::ubi_api::UbiApi>) -> AppResponse {
     
-    let player_stats = ubi_api.find_rank_stats(req.profile_id, req.region_id).await?;
+    let player_stats = ubi_api.find_rank_stats(req.profile_id, req.region_id, req.platform_type.as_str()).await?;
     
     Ok(HttpResponse::Ok().json(player_stats))
 }
