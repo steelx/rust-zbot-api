@@ -42,3 +42,11 @@ Content-Type: application/json
 ### FIND STATS
 GET http://127.0.0.1:8080/ubi/find_stats?profile_id=b5072e90-ad85-4bd8-9d18-e0bfe5f2aba5&region_id=apac&platform_type=uplay
 Content-Type: application/json
+
+### FIND XP, LEVEL
+GET http://127.0.0.1:8080/ubi/find_player_xp_profiles?profile_id=b5072e90-ad85-4bd8-9d18-e0bfe5f2aba5&platform_type=uplay
+Content-Type: application/json
+
+### FIND find_populations_statistics
+GET http://127.0.0.1:8080/ubi/find_populations_statistics?profile_id=b5072e90-ad85-4bd8-9d18-e0bfe5f2aba5&platform_type=uplay&statistics=casualpvp_timeplayed,casualpvp_matchwon,casualpvp_matchlost,casualpvp_matchplayed,casualpvp_kills,casualpvp_death,rankedpvp_matchwon,rankedpvp_matchlost,rankedpvp_timeplayed,rankedpvp_matchplayed,rankedpvp_kills,rankedpvp_death
+Content-Type: application/json

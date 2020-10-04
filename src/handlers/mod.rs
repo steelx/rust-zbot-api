@@ -24,6 +24,8 @@ pub fn app_config(config: &mut ServiceConfig) {
     //ubi
     let find_profile = web::resource("/ubi/find_profile").route(web::get().to(r6stats::find_profile));
     let find_stats = web::resource("/ubi/find_stats").route(web::get().to(r6stats::find_stats));
+    let find_populations_statistics = web::resource("/ubi/find_populations_statistics").route(web::get().to(r6stats::find_populations_statistics));
+    let find_player_xp_profiles = web::resource("/ubi/find_player_xp_profiles").route(web::get().to(r6stats::find_player_xp_profiles));
 
     config
         .service(ping_resource)
@@ -31,6 +33,8 @@ pub fn app_config(config: &mut ServiceConfig) {
         .service(auth)
         .service(me)
         .service(find_stats)
+        .service(find_populations_statistics)
+        .service(find_player_xp_profiles)
         .service(find_profile);
 }
 

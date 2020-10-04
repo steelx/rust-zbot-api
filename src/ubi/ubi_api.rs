@@ -4,6 +4,7 @@ use crate::UbiUserRepository;
 use crate::db;
 use actix_web::HttpResponse;
 use serde::{Deserialize, Serialize};
+// use serde_json::json;
 use std::collections::HashMap;
 use sqlx::{error::DatabaseError, postgres::PgError};
 use tracing::{debug, info};
@@ -38,6 +39,23 @@ pub struct Profile {
 #[serde(rename_all = "camelCase")]
 pub struct Profiles {
     pub profiles: Vec<Profile>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PlayerXpProfiles {
+    pub player_profiles: Vec<PlayerXp>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PopulationsStatistics {
+    pub results: HashMap<String, HashMap<String, i32>>,
+}
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PlayerXp {
+    xp: i32,
+    profile_id: String,
+    lootbox_probability: i32,
+    level: i32,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -345,19 +363,102 @@ impl UbiApi {
         Ok(profiles)
     }
 
-    pub async fn find_rank_stats(&self, profile_id: String, region_id: String, platform_type: &str) -> AppResult<PlayerStats> {
+    fn get_ubi_spaces_url(&self, platform_type: &str) -> &str {
         let base_url = match platform_type {
 			"xbl" =>
-			"https://public-ubiservices.ubi.com/v1/spaces/98a601e5-ca91-4440-b1c5-753f601a2c90/sandboxes/OSBOR_XBOXONE_LNCH_A/r6karma/players",
+			"https://public-ubiservices.ubi.com/v1/spaces/98a601e5-ca91-4440-b1c5-753f601a2c90/sandboxes/OSBOR_XBOXONE_LNCH_A",
 			"psn" =>
-            "https://public-ubiservices.ubi.com/v1/spaces/05bfb3f7-6c21-4c42-be1f-97a33fb5cf66/sandboxes/OSBOR_PS4_LNCH_A/r6karma/players",
+            "https://public-ubiservices.ubi.com/v1/spaces/05bfb3f7-6c21-4c42-be1f-97a33fb5cf66/sandboxes/OSBOR_PS4_LNCH_A",
             _ =>
-			"https://public-ubiservices.ubi.com/v1/spaces/5172a557-50b5-4665-b7db-e3f2e8c5041d/sandboxes/OSBOR_PC_LNCH_A/r6karma/players",
+			"https://public-ubiservices.ubi.com/v1/spaces/5172a557-50b5-4665-b7db-e3f2e8c5041d/sandboxes/OSBOR_PC_LNCH_A",
         };
 
+        base_url
+    }
+
+    // extra stats
+    pub async fn find_populations_statistics(
+        &self, profile_id: &str,
+        platform_type: &str,
+        statistics_comma_sep_str: &str) -> AppResult<PopulationsStatistics> {
+        // https://public-ubiservices.ubi.com/v1/spaces/05bfb3f7-6c21-4c42-be1f-97a33fb5cf66/sandboxes/OSBOR_PS4_LNCH_A/
+        // playerstats2/statistics?populations=80189261-91c0-4bf1-a5ad-81df3e64423e&statistics=casualpvp_timeplayed,casualpvp_matchwon,casualpvp_matchlost,casualpvp_matchplayed,casualpvp_kills,casualpvp_death,rankedpvp_matchwon,rankedpvp_matchlost,rankedpvp_timeplayed,rankedpvp_matchplayed,rankedpvp_kills,rankedpvp_death
+
+        let base_url = format!("{}{}", self.get_ubi_spaces_url(platform_type), "/playerstats2/statistics");
 
         let url = reqwest::Url::parse_with_params(
-            base_url,
+            base_url.as_str(),
+            &[("populations", profile_id), ("statistics", statistics_comma_sep_str)])
+            .map_err(|op| {
+                debug!("Error parsing statistics URL {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            }
+        )?;
+
+        let response = self
+            .client
+            .get(url)
+            .headers(self.construct_headers(false))
+            .send()
+            .await
+            .map_err(|op| {
+                debug!("Error ubi_api could not find populations statistics. {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            })?;
+
+        // let res = response.text().await.map_err(|op| {
+        //     debug!("Error parsing find_populations_statistics {:?}", op);
+        //     AppError::INTERNAL_ERROR.default()
+        // })?;
+        // debug!("{:#?}", res);
+
+        let body = response.json::<PopulationsStatistics>().await
+            .map_err(|op| {
+                debug!("Error parsing find_populations_statistics {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            })?;
+
+        Ok(body)
+    }
+
+    //PlayerXpProfiles
+    pub async fn find_player_xp_profiles(&self, profile_id: String, platform_type: &str) -> AppResult<PlayerXpProfiles> {
+        let base_url = format!("{}{}", self.get_ubi_spaces_url(platform_type), "/r6playerprofile/playerprofile/progressions");
+
+        let url = reqwest::Url::parse_with_params(
+            base_url.as_str(),
+            &[("profile_ids", &profile_id)])
+            .map_err(|op| {
+                debug!("Error parsing URL {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            }
+        )?;
+
+        let response = self
+            .client
+            .get(url)
+            .headers(self.construct_headers(false))
+            .send()
+            .await
+            .map_err(|op| {
+                debug!("Error ubi_api could not find stats. {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            })?;
+
+        let body = response.json::<PlayerXpProfiles>().await
+            .map_err(|op| {
+                debug!("Error parsing PlayerXpProfiles {:?}", op);
+                AppError::INTERNAL_ERROR.default()
+            })?;
+
+        Ok(body)
+    }
+
+    pub async fn find_rank_stats(&self, profile_id: String, region_id: String, platform_type: &str) -> AppResult<PlayerStats> {
+        let base_url = format!("{}{}", self.get_ubi_spaces_url(platform_type), "/r6karma/players");
+
+        let url = reqwest::Url::parse_with_params(
+            base_url.as_str(),
             &[("board_id", "pvp_ranked"), ("profile_ids", &profile_id), ("region_id", &region_id), ("season_id", "-1")])
             .map_err(|op| {
                 debug!("Error parsing URL {:?}", op);
