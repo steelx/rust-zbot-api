@@ -15,7 +15,7 @@ content-type: application/json
 ### GET PROFILE
 GET http://127.0.0.1:8080/me
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZS0yZmU2LTRkYjktYWU1Yi1iZmNmMDE2ZGQ2NTgiLCJleHAiOjE2MDE1MzE1NDl9.xoft1tIUB6DLaWtqsQcDwPT-yBUGzrE25NkVL-RUaTI
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZS0yZmU2LTRkYjktYWU1Yi1iZmNmMDE2ZGQ2NTgiLCJleHAiOjE2MDIzNDcyNzF9.l41O7p4hmVrvgEpf4zrrgw9LCcklOty9lcnRlVO2laM
 
 
 ### UPDATE PROFILE
@@ -32,7 +32,7 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZ
 ### LOGIN
 POST http://127.0.0.1:8080/auth HTTP/1.1
 content-type: application/json
-Authorization: Basic ajinkya_test:123456
+Authorization: Basic ajinkya_test 123456
 
 
 ### FIND PROFILE
