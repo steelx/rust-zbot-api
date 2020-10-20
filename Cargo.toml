@@ -1,5 +1,5 @@
 [package]
-name = "discord-zbot-api"
+name = "zbot_api"
 version = "0.1.0"
 authors = ["ajinkya"]
 edition = "2018"

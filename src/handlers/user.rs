@@ -115,5 +115,18 @@ pub async fn update_profile(
     //update to DB
     let updated_user = repository.update_profile(user.id, profile.0).await?;
 
-    Ok(HttpResponse::Ok().json(updated_user))
+    match repository.find_location_by_user_id(user.id).await {
+        Ok(user_location) => {
+            match user_location {
+                Some(location) => {
+                    let user_with_locations = updated_user.with_locations(location.to_array());
+                    Ok(HttpResponse::Ok().json(user_with_locations))
+                },
+                None => {
+                    Ok(HttpResponse::Ok().json(user))
+                }
+            }
+        },
+        Err(_) => Ok(HttpResponse::Ok().json(user))
+    }
 }

@@ -21,12 +21,13 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZ
 ### UPDATE PROFILE
 POST http://127.0.0.1:8080/me
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYWRmYzkyZS0yZmU2LTRkYjktYWU1Yi1iZmNmMDE2ZGQ2NTgiLCJleHAiOjE1OTk5MjM5NDN9.O2aWi4QDS7Ac__UGDACQA0sttosAJIGPkUIeUb2MwB4
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyYjQzNzY0MC03NTAwLTQ0OTEtYjM0YS02NGI4OTdhYmUzOWUiLCJleHAiOjE2MDMzMDA0MzN9.g1J1G17fWeL4bMON9J_AY7-jA22V6lb7wNe55oHU5ek
 
 {
     "full_name": "Ajinkya X",
     "bio": "love to code in Rust programming language!!!",
-    "image": "https://i.imgur.com/8X0r6Uz.png"
+    "image": "https://i.imgur.com/8X0r6Uz.png",
+  "locations": ["Bavdhan", "Pune", "Maharashtra", "India"]
 }
 
 ### LOGIN

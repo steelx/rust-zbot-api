@@ -809,36 +809,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "discord-zbot-api"
-version = "0.1.0"
-dependencies = [
- "actix-identity",
- "actix-rt",
- "actix-web",
- "actix-web-httpauth",
- "argonautica",
- "chrono",
- "color-eyre",
- "config",
- "dotenv",
- "eyre",
- "futures 0.3.5",
- "jsonwebtoken",
- "reqwest",
- "serde 1.0.115",
- "serde_derive",
- "serde_json",
- "sqlx",
- "tracing",
- "tracing-futures",
- "tracing-log",
- "tracing-subscriber",
- "uuid",
- "validator",
- "validator_derive",
-]
-
-[[package]]
 name = "dotenv"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3156,4 +3126,34 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39f0c922f1a334134dc2f7a8b67dc5d25f0735263feec974345ff706bcf20b0d"
 dependencies = [
  "linked-hash-map 0.5.3",
+]
+
+[[package]]
+name = "zbot_api"
+version = "0.1.0"
+dependencies = [
+ "actix-identity",
+ "actix-rt",
+ "actix-web",
+ "actix-web-httpauth",
+ "argonautica",
+ "chrono",
+ "color-eyre",
+ "config",
+ "dotenv",
+ "eyre",
+ "futures 0.3.5",
+ "jsonwebtoken",
+ "reqwest",
+ "serde 1.0.115",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "tracing",
+ "tracing-futures",
+ "tracing-log",
+ "tracing-subscriber",
+ "uuid",
+ "validator",
+ "validator_derive",
 ]

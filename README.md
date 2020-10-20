@@ -25,6 +25,7 @@ cargo install --version=0.1.0-beta.1 sqlx-cli
 
 
 ### Create DB tables
+https://github.com/launchbadge/sqlx/tree/master/sqlx-cli
 ```
 sqlx mig add create_tables
 
