@@ -20,8 +20,11 @@ use tracing::{debug, instrument};
 use validator::Validate;
 
 #[instrument(skip(user, repository, crypto_service))]
-pub async fn create_user(user: Json<NewUser>, repository: UserRepository, crypto_service: Data<CryptoService>) -> AppResponse {
-    
+pub async fn create_user(
+    user: Json<NewUser>,
+    repository: UserRepository,
+    crypto_service: Data<CryptoService>,
+) -> AppResponse {
     match user.validate() {
         Ok(_) => Ok(()),
         Err(e) => {
@@ -116,17 +119,13 @@ pub async fn update_profile(
     let updated_user = repository.update_profile(user.id, profile.0).await?;
 
     match repository.find_location_by_user_id(user.id).await {
-        Ok(user_location) => {
-            match user_location {
-                Some(location) => {
-                    let user_with_locations = updated_user.with_locations(location.to_array());
-                    Ok(HttpResponse::Ok().json(user_with_locations))
-                },
-                None => {
-                    Ok(HttpResponse::Ok().json(user))
-                }
+        Ok(user_location) => match user_location {
+            Some(location) => {
+                let user_with_locations = updated_user.with_locations(location.to_array());
+                Ok(HttpResponse::Ok().json(user_with_locations))
             }
+            None => Ok(HttpResponse::Ok().json(user)),
         },
-        Err(_) => Ok(HttpResponse::Ok().json(user))
+        Err(_) => Ok(HttpResponse::Ok().json(user)),
     }
 }

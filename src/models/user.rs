@@ -1,7 +1,7 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use validator::{Validate};
+use validator::Validate;
 
 //retrive from DB
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -15,7 +15,7 @@ pub struct User {
     pub bio: Option<String>,
     pub image: Option<String>,
     pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime
+    pub updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Serialize, sqlx::FromRow)]
@@ -91,9 +91,8 @@ pub struct NewUser {
 
 #[derive(Debug, Deserialize, Validate)]
 pub struct UpdateProfile {
-    #[validate(length(min = 5))]
+    #[validate(length(min = 4))]
     pub full_name: Option<String>,
-    #[validate(length(min = 5))]
     pub bio: Option<String>,
     #[validate(url)]
     pub image: Option<String>,
